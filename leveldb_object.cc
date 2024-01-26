@@ -763,7 +763,9 @@ static PyMethodDef PyLevelDB_methods[] = {
 	{(char*)"Delete",         (PyCFunction)PyLevelDB_Delete,    METH_VARARGS | METH_KEYWORDS, (char*)"delete a value in the database" },
 	{(char*)"Write",          (PyCFunction)PyLevelDB_Write,     METH_VARARGS | METH_KEYWORDS, (char*)"apply a write-batch"},
 	{(char*)"RangeIter",      (PyCFunction)PyLevelDB_RangeIter, METH_VARARGS | METH_KEYWORDS, (char*)"key/value range scan"},
-	{(char*)"GetStats",       (PyCFunction)PyLevelDB_GetStatus, METH_VARARGS | METH_NOARGS,   (char*)"get a mapping of all DB statistics"},
+	// 2024.01.26 by Kate Python36 -> Python38
+	//{(char*)"GetStats",       (PyCFunction)PyLevelDB_GetStatus, METH_VARARGS | METH_NOARGS,   (char*)"get a mapping of all DB statistics"},
+	{(char*)"GetStats",       (PyCFunction)PyLevelDB_GetStatus, METH_NOARGS,   (char*)"get a mapping of all DB statistics"},
 	{(char*)"CreateSnapshot", (PyCFunction)PyLevelDB_CreateSnapshot, METH_NOARGS, (char*)"create a new snapshot from current DB state"},
 	{(char*)"CompactRange", (PyCFunction)PyLevelDB_CompactRange, METH_VARARGS | METH_KEYWORDS, (char*)"Compact keys in the range"},
 	{NULL}

@@ -123,3 +123,10 @@ extern "C" void initleveldb(void)
 	return leveldb_module;
 #endif
 }
+
+#if PY_MAJOR_VERSION >= 3
+extern "C" void initleveldb(void)
+{
+	PyInit_leveldb();
+}
+#endif

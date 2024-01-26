@@ -23,7 +23,8 @@ bin
 *.exp
 *.deps
 *.pyd
-
+*.user
+*.log
 # LevelDB files
 *.sst
 *.ldb
@@ -32,3 +33,5 @@ LOG
 LOG.old
 CURRENT
 MANIFEST-*
+.vs/
+*.user
