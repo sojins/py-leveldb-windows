@@ -40,6 +40,33 @@ PyObject* pyleveldb_destroy_db(PyObject* self, PyObject* args)
 		return Py_None;
 }
 
+const char pyleveldb_dump_db_doc[] =
+"leveldb.DumpDB(db_dir)\n\nAttempts to recover as much data as possible from a corrupt database."
+;
+PyObject* pyleveldb_dump_db(PyObject* self, PyObject* args)
+{
+	const char* db_dir = 0;
+
+	if (!PyArg_ParseTuple(args, (char*)"s", &db_dir))
+		return 0;
+
+	std::string _db_dir(db_dir);
+	leveldb::Status status;
+	leveldb::Options options;
+
+	Py_BEGIN_ALLOW_THREADS
+		status = leveldb::DumpDB(_db_dir.c_str(), options);
+	Py_END_ALLOW_THREADS
+
+		if (!status.ok()) {
+			PyLevelDB_set_error(status);
+			return 0;
+		}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static void PyLevelDB_dealloc(PyLevelDB* self)
 {
 	Py_BEGIN_ALLOW_THREADS
@@ -592,6 +619,12 @@ static PyObject* PyLevelDB_RangeIter_(PyLevelDB* self, const leveldb::Snapshot* 
 	if (is_to)
 		PY_LEVELDB_RELEASE_BUFFER(b);
 
+	// 2024.01.29 by Kate Dump로 동작할 때
+	if (self->_db == NULL) {
+		//return pyleveldb_dump_db(self, args);
+		return PyErr_NoMemory();
+	}
+
 	// create iterator
 	leveldb::Iterator* iter = 0;
 
@@ -682,8 +715,7 @@ static PyObject* PyLevelDBSnapshot_RangeIter(PyLevelDBSnapshot* self, PyObject* 
 static PyObject* PyLevelDB_GetStatus(PyLevelDB* self)
 {
 	std::string value;
-
-	if (!self->_db->GetProperty(leveldb::Slice("leveldb.stats"), &value)) {
+	if (self->_db == NULL || !self->_db->GetProperty(leveldb::Slice("leveldb.stats"), &value)) {
 		PyErr_SetString(PyExc_ValueError, "unknown property");
 		return 0;
 	}
@@ -763,11 +795,14 @@ static PyMethodDef PyLevelDB_methods[] = {
 	{(char*)"Delete",         (PyCFunction)PyLevelDB_Delete,    METH_VARARGS | METH_KEYWORDS, (char*)"delete a value in the database" },
 	{(char*)"Write",          (PyCFunction)PyLevelDB_Write,     METH_VARARGS | METH_KEYWORDS, (char*)"apply a write-batch"},
 	{(char*)"RangeIter",      (PyCFunction)PyLevelDB_RangeIter, METH_VARARGS | METH_KEYWORDS, (char*)"key/value range scan"},
+#if PY_MINOR_VERSION < 8
 	// 2024.01.26 by Kate Python36 -> Python38
-	//{(char*)"GetStats",       (PyCFunction)PyLevelDB_GetStatus, METH_VARARGS | METH_NOARGS,   (char*)"get a mapping of all DB statistics"},
+	{(char*)"GetStats",       (PyCFunction)PyLevelDB_GetStatus, METH_VARARGS | METH_NOARGS,   (char*)"get a mapping of all DB statistics"},
+#else
 	{(char*)"GetStats",       (PyCFunction)PyLevelDB_GetStatus, METH_NOARGS,   (char*)"get a mapping of all DB statistics"},
+#endif
 	{(char*)"CreateSnapshot", (PyCFunction)PyLevelDB_CreateSnapshot, METH_NOARGS, (char*)"create a new snapshot from current DB state"},
-	{(char*)"CompactRange", (PyCFunction)PyLevelDB_CompactRange, METH_VARARGS | METH_KEYWORDS, (char*)"Compact keys in the range"},
+	{(char*)"CompactRange",   (PyCFunction)PyLevelDB_CompactRange, METH_VARARGS | METH_KEYWORDS, (char*)"Compact keys in the range"},
 	{NULL}
 };
 
@@ -969,7 +1004,8 @@ static int PyLevelDB_init(PyLevelDB* self, PyObject* args, PyObject* kwds)
 	std::string _db_dir(db_dir);
 
 	int i = 0;
-
+#if 0
+#else
 	Py_BEGIN_ALLOW_THREADS
 		status = leveldb::DB::Open(*self->_options, _db_dir, &self->_db);
 
@@ -991,7 +1027,7 @@ static int PyLevelDB_init(PyLevelDB* self, PyObject* args, PyObject* kwds)
 	}
 
 	Py_END_ALLOW_THREADS
-
+#endif
 		if (i == -1)
 			PyLevelDB_set_error(status);
 

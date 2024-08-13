@@ -71,9 +71,6 @@
     <ClCompile Include="..\leveldb\util\env.cc">
       <Filter>leveldb</Filter>
     </ClCompile>
-    <ClCompile Include="..\leveldb\util\env_win.cc">
-      <Filter>leveldb</Filter>
-    </ClCompile>
     <ClCompile Include="..\leveldb\db\filename.cc">
       <Filter>leveldb</Filter>
     </ClCompile>
@@ -113,9 +110,6 @@
     <ClCompile Include="..\leveldb\util\options.cc">
       <Filter>leveldb</Filter>
     </ClCompile>
-    <ClCompile Include="..\leveldb\port\port_win.cc">
-      <Filter>leveldb</Filter>
-    </ClCompile>
     <ClCompile Include="..\leveldb\db\repair.cc">
       <Filter>leveldb</Filter>
     </ClCompile>
@@ -143,5 +137,16 @@
     <ClCompile Include="..\leveldb\db\write_batch.cc">
       <Filter>leveldb</Filter>
     </ClCompile>
+    <ClCompile Include="..\leveldb\util\env_windows.cc">
+      <Filter>leveldb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\leveldb\db\dumpfile.cc">
+      <Filter>leveldb</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\leveldb\include\port\port_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

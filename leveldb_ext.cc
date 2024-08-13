@@ -9,6 +9,7 @@ static PyMethodDef leveldb_extension_methods[] =
 {
 	{ (char*)"RepairDB",  (PyCFunction)pyleveldb_repair_db,  METH_VARARGS | METH_KEYWORDS, (char*)pyleveldb_repair_db_doc  },
 	{ (char*)"DestroyDB", (PyCFunction)pyleveldb_destroy_db, METH_VARARGS, (char*)pyleveldb_destroy_db_doc },
+	{ (char*)"DumpDB",    (PyCFunction)pyleveldb_dump_db, METH_VARARGS, (char*)pyleveldb_dump_db_doc },
 	{NULL, NULL},
 };
 
@@ -124,9 +125,9 @@ extern "C" void initleveldb(void)
 #endif
 }
 
-#if PY_MAJOR_VERSION >= 3
-extern "C" void initleveldb(void)
-{
-	PyInit_leveldb();
-}
-#endif
+//#if PY_MAJOR_VERSION >= 3
+//extern "C" void initleveldb(void)
+//{
+//	PyInit_leveldb();
+//}
+//#endif

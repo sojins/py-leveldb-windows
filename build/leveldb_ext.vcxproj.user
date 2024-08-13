@@ -1,4 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DeploymentDirectory>D:\References\GitHub\Leveldb-py\Code</DeploymentDirectory>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>D:\Utility\Python38\python.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\References\GitHub\Leveldb-py\Code</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerCommandArguments>D:\References\GitHub\Leveldb-py\Code\LevelDB_Viewer.py</RemoteDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebuggerFlavor>PythonDebugLaunchProvider</DebuggerFlavor>
+    <RemoteDebuggerCommand>d:\utility\python3812\python.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\References\GitHub\Leveldb-py\Code</RemoteDebuggerWorkingDirectory>
+    <DeploymentDirectory>D:\References\GitHub\Leveldb-py\Code</DeploymentDirectory>
+    <RemoteDebuggerCommandArguments>D:\References\GitHub\Leveldb-py\Code\LevelDB_Viewer.py</RemoteDebuggerCommandArguments>
+    <RemoteDebuggerDeployCppRuntime>true</RemoteDebuggerDeployCppRuntime>
+    <LocalDebuggerCommand>$(PythonExe)</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import leveldb'); import leveldb"</LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>PYTHONPATH=$(TargetDir)</LocalDebuggerEnvironment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_py38|x64'">
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>D:\Utility\Python38\python.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>D:\References\GitHub\Leveldb-py\Code</RemoteDebuggerWorkingDirectory>
+    <DeploymentDirectory>D:\References\GitHub\Leveldb-py\Code</DeploymentDirectory>
+    <RemoteDebuggerCommandArguments>D:\References\GitHub\Leveldb-py\Code\LevelDB_Viewer.py</RemoteDebuggerCommandArguments>
+    <RemoteDebuggerDeployCppRuntime>true</RemoteDebuggerDeployCppRuntime>
+  </PropertyGroup>
 </Project>
