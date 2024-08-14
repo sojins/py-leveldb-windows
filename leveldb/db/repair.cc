@@ -394,6 +394,7 @@ class Repairer {
         ArchiveFile(dbname_ + "/" + manifests_[i]);
       }
 
+#if 0 // by Kate; If read-only mode, it doesn't requires
       // Install new manifest
       status = env_->RenameFile(tmp, DescriptorFileName(dbname_, 1));
       if (status.ok()) {
@@ -401,6 +402,7 @@ class Repairer {
       } else {
         env_->RemoveFile(tmp);
       }
+#endif
     }
     return status;
   }

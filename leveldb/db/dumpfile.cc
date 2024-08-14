@@ -233,6 +233,91 @@ Status DumpTable(Env* env, const std::string& fname, WritableFile* dst) {
   return Status::OK();
 }
 
+Status DumpTableToJson(Env* env, const std::string& fname, WritableFile* dst) {
+    std::fprintf(
+        stderr,
+        "DumpTable\n"
+        "   dump file: %s\n", fname.c_str());
+
+    uint64_t file_size;
+    RandomAccessFile* file = nullptr;
+    Table* table = nullptr;
+    Status s = env->GetFileSize(fname, &file_size);
+    if (s.ok()) {
+        s = env->NewRandomAccessFile(fname, &file);
+    }
+    if (s.ok()) {
+        // We use the default comparator, which may or may not match the
+        // comparator used in this database. However this should not cause
+        // problems since we only use Table operations that do not require
+        // any comparisons.  In particular, we do not call Seek or Prev.
+        s = Table::Open(Options(), file, file_size, &table);
+    }
+    if (!s.ok()) {
+        delete table;
+        delete file;
+        return s;
+    }
+    ReadOptions ro;
+    ro.fill_cache = false;
+    Iterator* iter = table->NewIterator(ro);
+    std::string r;
+    std::string json_str;
+
+    json_str = "[\n";
+    bool isAppend = false;
+    for (iter->SeekToFirst(); iter->Valid(); iter->Next()) {
+        r.clear();
+        ParsedInternalKey key;
+        if (isAppend)
+            json_str.append(",\n");
+
+        if (!ParseInternalKey(iter->key(), &key)) {
+            r = "{\"sequence\": -1,";
+            r += "\"badkey ";
+            AppendEscapedStringToHexlify(&r, iter->key());
+            r += "\" : \"";
+            AppendEscapedStringToHexlify(&r, iter->value());
+            r += "\", \"type\": \"none\"}";
+            json_str.append(r);
+        }
+        else {
+            r = "{\"sequence\": ";
+            AppendNumberTo(&r, key.sequence);
+            r += ", \"";
+            AppendEscapedStringToHexlify(&r, key.user_key);
+            r += "\" : \"";
+            AppendEscapedStringToHexlify(&r, iter->value());
+            r += "\", \"type\": \"";
+            if (key.type == kTypeDeletion) {
+                r += "del";
+            }
+            else if (key.type == kTypeValue) {
+                r += "val";
+            }
+            else {
+                AppendNumberTo(&r, key.type);
+            }
+            r += "\"}";
+            json_str.append(r);
+        }
+        isAppend = true;
+        dst->Append(json_str);
+        json_str = "";
+    }
+    json_str.append("]");
+    dst->Append(json_str);
+
+    s = iter->status();
+    if (!s.ok()) {
+        dst->Append("iterator error: " + s.ToString() + "\n");
+    }
+
+    delete iter;
+    delete table;
+    delete file;
+    return Status::OK();
+}
 }  // namespace
 
 Status DumpFile(Env* env, const std::string& fname, WritableFile* dst) {
@@ -246,7 +331,8 @@ Status DumpFile(Env* env, const std::string& fname, WritableFile* dst) {
     case kDescriptorFile:
       return DumpDescriptor(env, fname, dst);
     case kTableFile:
-      return DumpTable(env, fname, dst);
+      //return DumpTable(env, fname, dst);
+      return DumpTableToJson(env, fname, dst);
     default:
       break;
   }

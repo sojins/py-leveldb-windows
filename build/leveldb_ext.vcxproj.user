@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DeploymentDirectory>D:\References\GitHub\Leveldb-py\Code</DeploymentDirectory>
-    <DebuggerFlavor>PythonDebugLaunchProvider</DebuggerFlavor>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
     <RemoteDebuggerCommand>D:\Utility\Python38\python.exe</RemoteDebuggerCommand>
     <RemoteDebuggerWorkingDirectory>D:\References\GitHub\Leveldb-py\Code</RemoteDebuggerWorkingDirectory>
     <RemoteDebuggerCommandArguments>D:\References\GitHub\Leveldb-py\Code\LevelDB_Viewer.py</RemoteDebuggerCommandArguments>

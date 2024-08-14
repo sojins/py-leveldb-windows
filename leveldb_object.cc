@@ -53,9 +53,10 @@ PyObject* pyleveldb_dump_db(PyObject* self, PyObject* args)
 	std::string _db_dir(db_dir);
 	leveldb::Status status;
 	leveldb::Options options;
+	leveldb::DB* dbptr;
 
 	Py_BEGIN_ALLOW_THREADS
-		status = leveldb::DumpDB(_db_dir.c_str(), options);
+		status = leveldb::Dump(options, _db_dir.c_str(), &dbptr);
 	Py_END_ALLOW_THREADS
 
 		if (!status.ok()) {
@@ -64,7 +65,7 @@ PyObject* pyleveldb_dump_db(PyObject* self, PyObject* args)
 		}
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	return (PyObject*)dbptr;
 }
 
 static void PyLevelDB_dealloc(PyLevelDB* self)

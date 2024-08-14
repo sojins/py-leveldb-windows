@@ -35,6 +35,9 @@
 #include "util/logging.h"
 #include "util/mutexlock.h"
 
+// by Kate
+#include "leveldb/dumpfile.h"
+
 namespace leveldb {
 
 const int kNumNonTableCacheFiles = 10;
@@ -299,7 +302,8 @@ Status DBImpl::Recover(VersionEdit* edit, bool* save_manifest) {
   // may already exist from a previous failed creation attempt.
   env_->CreateDir(dbname_);
   assert(db_lock_ == nullptr);
-  Status s = env_->LockFile(LockFileName(dbname_), &db_lock_);
+  std::string lockname = LockFileName(dbname_) + ".recover";
+  Status s = env_->LockFile(lockname, &db_lock_);
   if (!s.ok()) {
     return s;
   }
@@ -324,6 +328,9 @@ Status DBImpl::Recover(VersionEdit* edit, bool* save_manifest) {
   }
 
   s = versions_->Recover(save_manifest);
+  env_->UnlockFile(db_lock_);  // Ignore error since state is already gone
+  env_->RemoveFile(lockname);
+
   if (!s.ok()) {
     return s;
   }
@@ -1572,36 +1579,68 @@ Status DestroyDB(const std::string& dbname, const Options& options) {
   return result;
 }
 
+Status Dump(const Options& options, const std::string& dbname, DB** dbptr) {
+    return DB::Dump(options, dbname, dbptr);
+}
 
-Status DumpDB(const std::string& dbname, const Options& options) {
+Status DB::Dump(const Options& options, const std::string& dbname, DB** dbptr) {
     Env* env = options.env;
+    *dbptr = nullptr;
+
     std::vector<std::string> filenames;
-    Status result = env->GetChildren(dbname, &filenames);
-    if (!result.ok()) {
+    Status s = env->GetChildren(dbname, &filenames);
+    if (!s.ok()) {
         // Ignore error in case directory does not exist
         return Status::OK();
     }
 
-    FileLock* lock;
-    const std::string lockname = LockFileName(dbname);
-    result = env->LockFile(lockname, &lock);
-    if (result.ok()) {
+    DBImpl* impl = new DBImpl(options, dbname);
+    impl->mutex_.Lock();
+
+    if (s.ok() && impl->mem_ == nullptr) {
+        // Create a corresponding memtable.
+        //uint64_t new_log_number = impl->versions_->NewFileNumber();
+        //WritableFile* lfile;
+        //s = env->NewWritableFile(LogFileName(dbname, new_log_number),
+        //    &lfile);
+        if (s.ok()) {
+            //impl->logfile_ = lfile;
+            impl->logfile_number_ = 0;// new_log_number;
+            //impl->log_ = new log::Writer(lfile);
+            impl->mem_ = new MemTable(impl->internal_comparator_);
+            impl->mem_->Ref();
+        }
+    
         uint64_t number;
         FileType type;
         for (size_t i = 0; i < filenames.size(); i++) {
             if (ParseFileName(filenames[i], &number, &type) &&
-                type != kDBLockFile) {  // Lock file will be deleted at end
-                //Status del = env->RemoveFile(dbname + "/" + filenames[i]);
-                //if (result.ok() && !del.ok()) {
-                //    result = del;
-                //}
+                type == kTableFile) {  // dump object
+                WritableFile* rfile;
+                s = env->NewWritableFile(dbname + "\\"+ filenames[i] + ".json",
+                    &rfile);
+                if (s.ok()) {
+                    Status s = DumpFile(env, dbname + "\\" + filenames[i], rfile);
+                    if (!s.ok()) {
+                        std::fprintf(stderr, "%s\n", s.ToString().c_str());
+                        s = Status::InvalidArgument(filenames[i] + ": not a dump-able file type");
+                    }
+                    rfile->Close();
+                }
+
+                delete rfile;
             }
-        }
-        env->UnlockFile(lock);  // Ignore error since state is already gone
-        //env->RemoveFile(lockname);
-        //env->RemoveDir(dbname);  // Ignore error in case dir contains other files
+		}
     }
-    return result;
+    impl->mutex_.Unlock();
+    if (s.ok()) {
+        assert(impl->mem_ != nullptr);
+        *dbptr = impl;
+    }
+    else {
+        delete impl;
+    }
+    return s;
 }
 
 }  // namespace leveldb

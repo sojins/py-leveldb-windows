@@ -128,7 +128,8 @@ LEVELDB_EXPORT void leveldb_destroy_db(const leveldb_options_t* options,
 LEVELDB_EXPORT void leveldb_repair_db(const leveldb_options_t* options,
                                       const char* name, char** errptr);
 
-LEVELDB_EXPORT void leveldb_dump_db(const leveldb_options_t* options, 
+// by Kate
+LEVELDB_EXPORT leveldb_t* leveldb_dump_db(const leveldb_options_t* options,
                                     const char* name, char** errptr);
 
 /* Iterator */

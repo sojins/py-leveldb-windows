@@ -26,6 +26,10 @@ void AppendNumberTo(std::string* str, uint64_t num);
 // Escapes any non-printable characters found in "value".
 void AppendEscapedStringTo(std::string* str, const Slice& value);
 
+// Append a human-readable printout of "value" to *str.
+// Escapes any non-printable characters found in "value".
+void AppendEscapedStringToHexlify(std::string* str, const Slice& value);
+
 // Return a human-readable printout of "num"
 std::string NumberToString(uint64_t num);
 

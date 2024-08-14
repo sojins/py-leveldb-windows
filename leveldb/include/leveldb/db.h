@@ -52,6 +52,9 @@ class LEVELDB_EXPORT DB {
   // Caller should delete *dbptr when it is no longer needed.
   static Status Open(const Options& options, const std::string& name,
                      DB** dbptr);
+  // by Kate
+  static Status Dump(const Options& options, const std::string& name,
+                     DB** dbptr);
 
   DB() = default;
 
@@ -162,8 +165,8 @@ LEVELDB_EXPORT Status DestroyDB(const std::string& name,
 LEVELDB_EXPORT Status RepairDB(const std::string& dbname,
                                const Options& options);
 
-LEVELDB_EXPORT Status DumpDB(const std::string& name,
-    const Options& options);
+LEVELDB_EXPORT Status Dump(const Options& options,
+    const std::string& name, DB** dbptr);
 
 }  // namespace leveldb
 

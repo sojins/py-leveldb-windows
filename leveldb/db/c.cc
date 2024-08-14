@@ -280,9 +280,16 @@ void leveldb_repair_db(const leveldb_options_t* options, const char* name,
   SaveError(errptr, RepairDB(name, options->rep));
 }
 
-void leveldb_dump_db(const leveldb_options_t* options, const char* name,
+// by Kate
+leveldb_t* leveldb_dump_db(const leveldb_options_t* options, const char* name,
     char** errptr) {
-    SaveError(errptr, DumpDB(name, options->rep));
+    DB* db;
+    if (SaveError(errptr, DB::Dump(options->rep, std::string(name), &db))) {
+        return nullptr;
+    }
+    leveldb_t* result = new leveldb_t;
+    result->rep = db;
+    return result;
 }
 
 void leveldb_iter_destroy(leveldb_iterator_t* iter) {
