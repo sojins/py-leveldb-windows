@@ -913,9 +913,11 @@ Status VersionSet::Recover(bool* save_manifest) {
       if (s.ok()) {
         if (edit.has_comparator_ &&
             edit.comparator_ != icmp_.user_comparator()->Name()) {
-          s = Status::InvalidArgument(
-              edit.comparator_ + " does not match existing comparator ",
-              icmp_.user_comparator()->Name());
+          // by Kate no-check comparator
+          // TODO: apply idb_cmp1
+          //s = Status::InvalidArgument(
+          //    edit.comparator_ + " does not match existing comparator ",
+          //    icmp_.user_comparator()->Name());
         }
       }
 

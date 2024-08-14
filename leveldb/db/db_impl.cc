@@ -1617,7 +1617,9 @@ Status DB::Dump(const Options& options, const std::string& dbname, DB** dbptr) {
             if (ParseFileName(filenames[i], &number, &type) &&
                 type == kTableFile) {  // dump object
                 WritableFile* rfile;
-                s = env->NewWritableFile(dbname + "\\"+ filenames[i] + ".json",
+                std::string json_name = dbname + "\\..\\out\\" + filenames[i] + ".json";
+                std::fprintf(stderr, "dump with %s\n", json_name.c_str());
+                s = env->NewWritableFile(json_name,
                     &rfile);
                 if (s.ok()) {
                     Status s = DumpFile(env, dbname + "\\" + filenames[i], rfile);
