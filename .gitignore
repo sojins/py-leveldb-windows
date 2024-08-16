@@ -36,3 +36,6 @@ MANIFEST-*
 .vs/
 *.user
 .github/
+/build/build/lib/FdLevelDB
+/build/FdLevelDB/utils/__pycache__
+/build/FdLevelDB.egg-info

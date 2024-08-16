@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{1c35699b-57c0-4408-b194-7c5c318bbdc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -34,5 +37,7 @@
     <None Include="..\win32_impl_src\leveldb.def">
       <Filter>pyleveldb</Filter>
     </None>
+    <None Include="setup.py" />
+    <None Include="FdLevelDB\__init__.py" />
   </ItemGroup>
 </Project>

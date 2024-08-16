@@ -242,6 +242,10 @@
       <AdditionalDependencies>python38.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>..\win32_impl_src\leveldb.def</ModuleDefinitionFile>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(SolutionDir)Build\FdLevelDB\"
+python "$(SolutionDir)Build\setup.py" bdist_wheel</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -255,6 +259,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\win32_impl_src\leveldb.def" />
+    <None Include="FdLevelDB\__init__.py" />
+    <None Include="setup.py" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="leveldb.vcxproj">

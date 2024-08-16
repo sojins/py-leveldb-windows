@@ -4,6 +4,7 @@
 #include "leveldb_ext.h"
 
 #include <leveldb/comparator.h>
+#include <codecvt>
 
 static PyObject* PyLevelDBIter_New(PyObject* ref, PyLevelDB* db, leveldb::Iterator* iterator, std::string* bound, int include_value, int is_reverse);
 static PyObject* PyLevelDBSnapshot_New(PyLevelDB* db, const leveldb::Snapshot* snapshot);
@@ -907,6 +908,27 @@ PyObject* pyleveldb_repair_db(PyLevelDB* self, PyObject* args, PyObject* kwds)
 		return Py_None;
 }
 
+std::wstring mbs2wc(const std::string& str)
+{
+	std::wstring msg;
+
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf16conv;
+	msg = utf16conv.from_bytes(str);
+
+	return msg;
+}
+
+std::string wc2mbs(const std::wstring& wstr)
+{
+	std::string msg;
+
+	static std::locale loc("");
+	auto& facet = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(loc);
+	msg = std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t>(&facet).to_bytes(wstr);
+
+	return msg;
+}
+
 static int PyLevelDB_init(PyLevelDB* self, PyObject* args, PyObject* kwds)
 {
 	// cleanup
@@ -955,7 +977,11 @@ static int PyLevelDB_init(PyLevelDB* self, PyObject* args, PyObject* kwds)
 		&block_cache_size,
 		&comparator))
 		return -1;
-
+	// by Kate 'UTF-8' file name support
+	std::string db_dir_ = db_dir;
+	std::wstring db_dirw = mbs2wc(db_dir_);
+	db_dir_ = wc2mbs(db_dirw);
+	db_dir = db_dir_.c_str();
 	if (write_buffer_size < 0 || block_size < 0 || max_open_files < 0 || block_restart_interval < 0 || block_cache_size < 0) {
 		PyErr_SetString(PyExc_ValueError, "negative write_buffer_size/block_size/max_open_files/block_restart_interval/cache_size");
 		return -1;
