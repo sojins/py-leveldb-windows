@@ -13,8 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="utils">
+    <Filter Include="pymodules">
       <UniqueIdentifier>{1c35699b-57c0-4408-b194-7c5c318bbdc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pymodules\utils">
+      <UniqueIdentifier>{b71b53b9-b5d1-4e0c-a45a-298ae5a8e99f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,12 +35,28 @@
     <ClInclude Include="..\leveldb_ext.h">
       <Filter>pyleveldb</Filter>
     </ClInclude>
+    <ClInclude Include="..\leveldb\include\leveldb\cache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\win32_impl_src\leveldb.def">
       <Filter>pyleveldb</Filter>
     </None>
     <None Include="setup.py" />
-    <None Include="FdLevelDB\__init__.py" />
+    <None Include="FdLevelDB\__init__.py">
+      <Filter>pymodules</Filter>
+    </None>
+    <None Include="FdLevelDB\utils\fdtkhexviewer.py">
+      <Filter>pymodules\utils</Filter>
+    </None>
+    <None Include="FdLevelDB\utils\fdtklist.py">
+      <Filter>pymodules\utils</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="FdLevelDB\utils\icon.png">
+      <Filter>pymodules\utils</Filter>
+    </Image>
   </ItemGroup>
 </Project>

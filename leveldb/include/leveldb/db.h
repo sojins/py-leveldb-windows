@@ -165,7 +165,7 @@ LEVELDB_EXPORT Status DestroyDB(const std::string& name,
 LEVELDB_EXPORT Status RepairDB(const std::string& dbname,
                                const Options& options);
 
-LEVELDB_EXPORT Status Dump(const Options& options,
+LEVELDB_EXPORT Status DumpDB(const Options& options,
     const std::string& name, DB** dbptr);
 
 }  // namespace leveldb

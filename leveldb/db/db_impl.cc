@@ -1579,10 +1579,6 @@ Status DestroyDB(const std::string& dbname, const Options& options) {
   return result;
 }
 
-Status Dump(const Options& options, const std::string& dbname, DB** dbptr) {
-    return DB::Dump(options, dbname, dbptr);
-}
-
 Status DB::Dump(const Options& options, const std::string& dbname, DB** dbptr) {
     Env* env = options.env;
     *dbptr = nullptr;

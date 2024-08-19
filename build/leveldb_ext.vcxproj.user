@@ -21,12 +21,4 @@
     <LocalDebuggerCommandArguments>-i -c "print('&gt;&gt;&gt; import leveldb'); import leveldb"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PYTHONPATH=$(TargetDir)</LocalDebuggerEnvironment>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_py38|x64'">
-    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
-    <RemoteDebuggerCommand>D:\Utility\Python38\python.exe</RemoteDebuggerCommand>
-    <RemoteDebuggerWorkingDirectory>D:\References\GitHub\Leveldb-py\Code</RemoteDebuggerWorkingDirectory>
-    <DeploymentDirectory>D:\References\GitHub\Leveldb-py\Code</DeploymentDirectory>
-    <RemoteDebuggerCommandArguments>D:\References\GitHub\Leveldb-py\Code\LevelDB_Viewer.py</RemoteDebuggerCommandArguments>
-    <RemoteDebuggerDeployCppRuntime>true</RemoteDebuggerDeployCppRuntime>
-  </PropertyGroup>
 </Project>

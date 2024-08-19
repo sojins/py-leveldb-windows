@@ -450,4 +450,8 @@ Status RepairDB(const std::string& dbname, const Options& options) {
   return repairer.Run();
 }
 
+//Status DumpDB(const Options& options, const std::string& dbname, DB** dbptr) {
+//    return DB::Dump(options, dbname, dbptr);
+//}
+
 }  // namespace leveldb

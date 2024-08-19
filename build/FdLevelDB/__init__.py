@@ -1,8 +1,6 @@
-from FdLevelDB import leveldb
+import leveldb
 
-version = __version__ = "1.0.0.0"
-
-print('Running FdLevelDB', version)
+print(f'Running {__name__}')
 
 __all__ = [
         'FdLevelDB',

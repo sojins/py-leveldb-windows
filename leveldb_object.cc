@@ -9,6 +9,9 @@
 static PyObject* PyLevelDBIter_New(PyObject* ref, PyLevelDB* db, leveldb::Iterator* iterator, std::string* bound, int include_value, int is_reverse);
 static PyObject* PyLevelDBSnapshot_New(PyLevelDB* db, const leveldb::Snapshot* snapshot);
 
+std::wstring mbs2wc(const std::string& str);
+std::string wc2mbs(const std::wstring& wstr);
+
 static void PyLevelDB_set_error(leveldb::Status& status)
 {
 	PyErr_SetString(leveldb_exception, status.ToString().c_str());
@@ -28,6 +31,12 @@ PyObject* pyleveldb_destroy_db(PyObject* self, PyObject* args)
 	leveldb::Status status;
 	leveldb::Options options;
 
+	// by Kate 'UTF-8' file name support
+	std::string db_dir_ = db_dir;
+	std::wstring db_dirw = mbs2wc(db_dir_);
+	_db_dir = wc2mbs(db_dirw);
+
+
 	Py_BEGIN_ALLOW_THREADS
 		status = leveldb::DestroyDB(_db_dir.c_str(), options);
 	Py_END_ALLOW_THREADS
@@ -41,33 +50,39 @@ PyObject* pyleveldb_destroy_db(PyObject* self, PyObject* args)
 		return Py_None;
 }
 
-const char pyleveldb_dump_db_doc[] =
-"leveldb.DumpDB(db_dir)\n\nAttempts to recover as much data as possible from a corrupt database."
-;
-PyObject* pyleveldb_dump_db(PyObject* self, PyObject* args)
-{
-	const char* db_dir = 0;
-
-	if (!PyArg_ParseTuple(args, (char*)"s", &db_dir))
-		return 0;
-
-	std::string _db_dir(db_dir);
-	leveldb::Status status;
-	leveldb::Options options;
-	leveldb::DB* dbptr;
-
-	Py_BEGIN_ALLOW_THREADS
-		status = leveldb::Dump(options, _db_dir.c_str(), &dbptr);
-	Py_END_ALLOW_THREADS
-
-		if (!status.ok()) {
-			PyLevelDB_set_error(status);
-			return 0;
-		}
-
-	Py_INCREF(Py_None);
-	return (PyObject*)dbptr;
-}
+//const char pyleveldb_dump_db_doc[] =
+//"leveldb.DumpDB(db_dir)\n\nAttempts to recover as much data as possible from a corrupt database."
+//;
+//PyObject* pyleveldb_dump_db(PyObject* self, PyObject* args)
+//{
+//	const char* db_dir = 0;
+//
+//	if (!PyArg_ParseTuple(args, (char*)"s", &db_dir))
+//		return 0;
+//
+//	std::string _db_dir(db_dir);
+//	leveldb::Status status;
+//	leveldb::Options options;
+//	leveldb::DB* dbptr = 0;
+//
+//	// by Kate 'UTF-8' file name support
+//	std::string db_dir_ = db_dir;
+//	std::wstring db_dirw = mbs2wc(db_dir_);
+//	_db_dir = wc2mbs(db_dirw);
+//
+//	Py_BEGIN_ALLOW_THREADS
+//		status = leveldb::DestroyDB(_db_dir.c_str(), options);
+//		//status = leveldb::DumpDB(options, _db_dir.c_str(), &dbptr);
+//	Py_END_ALLOW_THREADS
+//
+//		if (!status.ok()) {
+//			PyLevelDB_set_error(status);
+//			return 0;
+//		}
+//
+//	Py_INCREF(Py_None);
+//	return (PyObject*)dbptr;
+//}
 
 static void PyLevelDB_dealloc(PyLevelDB* self)
 {
