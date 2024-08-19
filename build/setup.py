@@ -7,7 +7,6 @@ if __name__ == '__main__':
                        libraries = ['static_leveldb'],
                        library_dirs = [r'lib', r'D:/Utility/Python38/libs'],
                        sources=[r'../leveldb_object.cc', r'../leveldb_ext.cc'],
-                       extra_compile_args=['/x64'],
                        )
     setup(
         name='FdLevelDB',
