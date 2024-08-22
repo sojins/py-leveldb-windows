@@ -53,6 +53,7 @@
     <None Include="FdLevelDB\utils\fdtklist.py">
       <Filter>pymodules\utils</Filter>
     </None>
+    <None Include="setup32.py" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="FdLevelDB\utils\icon.png">

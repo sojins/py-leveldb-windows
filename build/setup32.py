@@ -3,14 +3,14 @@ from setuptools import setup, find_packages, Extension
 
 if __name__ == '__main__':
     leveldb_module = Extension('leveldb', 
-                       include_dirs = [r'../../leveldb',r'../../leveldb/include', r'../../snappy', r'D:/Utility/Python38/include'],
-                       libraries = ['static_leveldb'],
-                       library_dirs = [r'lib', r'D:/Utility/Python38/libs'],
+                       include_dirs = [r'../../leveldb',r'../../leveldb/include', r'../../snappy', r'D:\References\Python-3.8.12\Include'],
+                       libraries = ['static_leveldb32'],
+                       library_dirs = [r'lib32', r'D:\References\Python-3.8.12\PCbuild\win32'],
                        sources=[r'../leveldb_object.cc', r'../leveldb_ext.cc'],
                        )
     setup(
         name='FdLevelDB',
-        version='1.0.0.3',
+        version='1.0.0.1',
         description='Google LevelDB using Python by FINALDATA',
         long_description='Google LevelDB using Python by FINALDATA',
         url='package_url',

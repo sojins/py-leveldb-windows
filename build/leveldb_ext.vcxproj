@@ -161,8 +161,7 @@
       <ModuleDefinitionFile>..\win32_impl_src\leveldb.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>D:\References\Python-3.8.12\externals\pythonx86\tools\python.exe "$(SolutionDir)Build\setup32.py" bdist_wheel</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -205,6 +204,7 @@
     <None Include="FdLevelDB\utils\fdtklist.py" />
     <None Include="FdLevelDB\__init__.py" />
     <None Include="setup.py" />
+    <None Include="setup32.py" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="leveldb.vcxproj">

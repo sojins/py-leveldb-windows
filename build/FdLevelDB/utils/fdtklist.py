@@ -168,10 +168,14 @@ class FDTreeFrame(ttk.Frame):
         
         self.ysb = tk.Scrollbar(
             self, orient=tk.VERTICAL, command=self.tree.yview)
-        self.tree.configure(yscroll=self.ysb.set)
+
+        self.xsb =  tk.Scrollbar(
+            self, orient=tk.HORIZONTAL, command=self.tree.xview)
+        self.tree.configure(yscroll=self.ysb.set, xscroll=self.xsb.set)
 
         self.tree.grid(row=0, column=0, sticky=(tk.N, tk.S, tk.E, tk.W))
         self.ysb.grid(row=0, column=1, sticky=(tk.N, tk.S))
+        self.xsb.grid(row=1, column=0, sticky=(tk.E, tk.W))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
@@ -627,6 +631,12 @@ def load_leveldb_data(file_dir,prefix='FDCache_Data', cleanup_dir=True):
             except Exception as e:
                 print(f'Remove folder failed: {e}')
 
+def adjust_column_widths(tree, columns, data):
+    for col in columns:
+        max_width = max([len(str(item)) for item in data] + [len(col)])
+        max_width = min(20, max_width)
+        tree.column(col, width=max_width * 10)  # 10: font width
+        tree.heading(col, text=columns[col]['label'], anchor='w')
 
 def view_data(json_file=None, json_data=None, initial_dir=None):
     root: Tk = tk.Tk()
@@ -647,6 +657,7 @@ def view_data(json_file=None, json_data=None, initial_dir=None):
         app = FDTreeFrame(root, json_path=json_file, initial_dir=initial_dir)
     elif json_data:
         app = FDTreeFrame(root, json_data=json_data, initial_dir=initial_dir)
+        adjust_column_widths(app.tree, app.columns, json_data)
     else:
         app = FDTreeFrame(root)
 
