@@ -62,7 +62,7 @@ class TreeviewSorter:
         col_index = col  #self.treeview["columns"].index(col)
         
         if type(items[0][0][col_index]) == int:
-            sort_fn = lambda x: float(x[col_index])
+            sort_fn = lambda x: float(x[0][col_index])
         else:
             if col_index == -1: # 숫자로된 문자열일 때
                 # sorted(items, key=lambda item: float(item[-1]), reverse=True)
@@ -130,11 +130,19 @@ class FDTreeFrame(ttk.Frame):
             idx += 1
 
     def sort_column(self, event):
+        region = self.tree.identify_region(event.x, event.y)
+        if region != "heading":
+            return
         if not self.tree_sort:
             self.tree_sort = TreeviewSorter(self.tree)
         if self.tree_sort:
             self.tree_sort.sort_column_clicked(event)
             self.tree = self.tree_sort.treeview
+
+    def on_column_resize(self, event):
+        region = self.tree.identify_region(event.x, event.y)
+        if region == "separator":
+            pass
 
     def create_widgets(self):
         # https://stackoverflow.com/questions/69223318/using-multiple-tkinter-treeview-styles-in-same-program
@@ -154,7 +162,8 @@ class FDTreeFrame(ttk.Frame):
                             , height=5)
                             #    style="fortree1.Treeview") #, displaycolumns=display_orders)
         self.tree.bind('<Double-1>', self.click_item)
-        self.tree.bind('<ButtonRelease-1>', self.sort_column)
+        self.tree.bind('<ButtonRelease-1>', self.on_column_resize)
+        self.tree.bind('<Button-1>', self.sort_column)
 
         # 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
         if len(self.columns) > 0:
