@@ -93,7 +93,19 @@ class FDTreeFrame(ttk.Frame):
                 if self.winfo_reqwidth() >= pixels:
                     break
                 self.config(width=width + w)
-
+    
+    def get_unique_columns(self, data):
+        # self.columns = data[0]
+        # 컬럼을 모두 포함하도록 변경
+        columns = []
+        last_columns = []
+        for x in data:
+            if last_columns != x.keys():
+                columns += list(x.keys())
+            last_columns = x.keys()
+        columns = list(set(columns))
+        return columns
+    
     def __init__(self, master, json_path=None, json_data=None, initial_dir="~/"):
         super().__init__(master)
         self.master = master
@@ -103,8 +115,8 @@ class FDTreeFrame(ttk.Frame):
             self.set_table_data_from_json_path(json_path)
         else:
             if isinstance(data, list):
-                self.columns = data[0]
-                self.set_columns(self.columns)    
+                self.columns = self.get_unique_columns(data)
+                self.set_columns(self.columns)
             else:
                 self.set_columns({})
             self.create_widgets()
@@ -125,8 +137,10 @@ class FDTreeFrame(ttk.Frame):
     def set_columns(self, columns: dict):
         idx = 1
         self.columns = {}
+        self.columns_order = []
         for k in columns:
             self.columns['c' + str(idx)] = {'label': k, 'width': 150}
+            self.columns_order.append(k)
             idx += 1
 
     def sort_column(self, event):
@@ -210,7 +224,15 @@ class FDTreeFrame(ttk.Frame):
 
     def insert_node_new(self, parent, key, value):
         if isinstance(value, dict):
-            v = tuple(value.values())
+            # columns 순서가 다르거나 갯수가 다른 경우 처리
+            # v = tuple(value.values())
+            ordered_values = []
+            for col_name in self.columns_order:
+                try:
+                    ordered_values.append(value[col_name])
+                except:
+                    ordered_values.append(None)
+            v = tuple(ordered_values)
             self.tree.insert('', 'end', text=str(key), values=v, iid=key, tags = ('normal',))
 
     def insert_node_old(self, parent, key, value):
@@ -253,9 +275,9 @@ class FDTreeFrame(ttk.Frame):
             # messagebox.showinfo("Info", item_text)
             if '(Hex)' in label and len(item_text) > 3 and item_text[0] == 'b':
                 item_bin = binascii.unhexlify(item_text[2:][:-1])
-                HexViewer().display_hex(data=item_bin, title=f'#{selected_item}->{label}')
+                HexViewer(data=item_bin).display_hex(title=f'#{selected_item}->{label}')
             else:
-                HexViewer().display_hex(data=item_text)
+                HexViewer(data=item_text).display_hex(title=f'#{selected_item}->{label}')
         except Exception as e:
             print(e)
             pass
@@ -456,7 +478,7 @@ class FDTreeFrame(ttk.Frame):
         self.save_json_history(file_path)
         # self.set_table_data_from_json(data)
         if isinstance(data, list):
-            self.columns = data[0]
+            self.columns = self.get_unique_columns(data)
             self.set_columns(self.columns)    
         else:
             self.set_columns({})
@@ -473,7 +495,7 @@ class FDTreeFrame(ttk.Frame):
             self.save_json_history(file_path)
         try:
             if isinstance(data, list):
-                self.columns = data[0]
+                self.columns = self.get_unique_columns(data)
                 self.set_columns(self.columns)    
             else:
                 self.set_columns({})
