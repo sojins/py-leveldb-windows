@@ -1,3 +1,6 @@
+__version__ = "1.0.1"
+__author__ = "Kate Choi <sojins@finaldata.com>"
+
 import os
 # import pyjsonviewer
 import tkinter as tk
@@ -6,7 +9,7 @@ from tkinter import filedialog, Tk
 from tkinter import font
 from tkinter import messagebox
 import json
-from FdLevelDB import leveldb
+# from FdLevelDB import leveldb
 import shutil, tempfile
 import binascii
 try:
@@ -20,7 +23,7 @@ FILETYPES = [("WMIC Log files", "*.txt"), ("All Files", "*.*")]
 HISTORY_FILE_PATH = os.path.join(os.path.expanduser('~'),
                                  ".fdpylistiewer_history")
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-VERSION = '1.0.0'
+VERSION = '1.0.0.1'
 PROGRAM_NAME = f'FD PyDBViewer'
 def removeChars(text):
     return ''.join([i if (ord(i) > 31 and ord(i) < 128) else '' for i in text])
@@ -129,10 +132,14 @@ class FDTreeFrame(ttk.Frame):
         self.item_found = []
         self.item_idx = 0
         self.tree_sort = None
+        init_dir_cnt = f'{initial_dir}'
         if data:
             self.set_table_data_from_json(data)
-            if initial_dir != "~/":
-                self.master.title(f'{PROGRAM_NAME} - {initial_dir}')
+            init_dir_cnt += f' [{len(data)}]'
+        else:
+            init_dir_cnt += f' [NO DATA]'
+        if initial_dir != "~/":
+            self.master.title(f'{PROGRAM_NAME} - {init_dir_cnt}')
 
     def set_columns(self, columns: dict):
         idx = 1
@@ -554,7 +561,7 @@ class FDTreeFrame(ttk.Frame):
         by Kate Choi
         : referenced from pyjsonviewer
 
-        Ver.{VERSION}\n
+        Ver.{__version__}\n
         """
         messagebox.showinfo("About", msg)
 
@@ -690,7 +697,7 @@ def view_data(json_file=None, json_data=None, initial_dir=None):
         app = FDTreeFrame(root, json_data=json_data, initial_dir=initial_dir)
         adjust_column_widths(app.tree, app.columns, json_data)
     else:
-        app = FDTreeFrame(root)
+        app = FDTreeFrame(root, initial_dir=initial_dir)
 
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="Open", accelerator='Ctrl+O',

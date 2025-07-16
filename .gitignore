@@ -37,9 +37,10 @@ MANIFEST-*
 *.user
 .github/
 /build/lib
-/build/FdLevelDB/utils/__pycache__
+__pycache__/
 /build/FdLevelDB.egg-info
 /build/build
 
 /build/dist
 *.idb
+*.user

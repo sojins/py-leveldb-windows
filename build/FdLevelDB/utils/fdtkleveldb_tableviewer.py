@@ -1,9 +1,13 @@
+__version__ = "1.0.1"
+__author__ = "Kate Choi <sojins@finaldata.com>"
+
 from ccl_chromium_reader import ccl_chromium_indexeddb
 from FdLevelDB.utils.fdtklist import view_data
 
 import tkinter as tk
 from tkinter import filedialog
 import tkinter.ttk as ttk
+import os
 
 TITLE="Select Level DB directory"
 
@@ -34,6 +38,28 @@ class DBSelector(ttk.Frame):
         except:
             pass
 
+    def find_indexeddb_components(self, selected_dir):
+        # 마지막 폴더 이름이 'IndexedDB'인지 확인
+        if os.path.basename(selected_dir) != "IndexedDB":
+            return None
+
+        # 하위 폴더 중 '.blob', '.leveldb'로 끝나는 폴더 찾기
+        blob_path = None
+        leveldb_path = None
+
+        for entry in os.listdir(selected_dir):
+            full_path = os.path.join(selected_dir, entry)
+            if os.path.isdir(full_path):
+                if entry.endswith(".blob"):
+                    blob_path = full_path
+                elif entry.endswith(".leveldb"):
+                    leveldb_path = full_path
+
+        if blob_path and leveldb_path:
+            return blob_path, leveldb_path
+        else:
+            return None
+
     def select_log_dir(self):
         """
         :param event: event arg (not used)
@@ -41,14 +67,30 @@ class DBSelector(ttk.Frame):
         file_path = filedialog.askdirectory(
             initialdir=self.initial_dir,
             title=TITLE)
+        (blob_path, leveldb_path) = self.find_indexeddb_components(file_path)
+        if blob_path and leveldb_path:
+            (wrapper, db_names) = load_data(db_dir=leveldb_path, blob_dir=blob_path)
+            self.root.destroy()  # 또는 self.window.destroy()
+            DBSelector(wrapper, data=db_names, cb=view_table_cb).select_db_by_tree()
+            return
         (wrapper, db_names) = load_data(file_path)
         if db_names:
             self.root.title(file_path)
         self.insert_db_list(wrapper=wrapper, data=db_names)
 
+    def get_rows(self, db_name:str, table_name:str):
+        obj_store = self.wrapper[db_name][table_name]
+        list_data = []
+        for record in obj_store.iterate_records(
+                errors_to_stdout=True, 
+                bad_deserializer_data_handler= lambda k,v: print(f"error: {k}, {v}")):
+            if record.value:
+                list_data.append(record.value)
+        return len(list_data)
+
     def select_db_by_tree(self):
         # self.sub_win = tk.Toplevel()
-        self.root.geometry("400x300")
+        self.root.geometry("640x480")
         # Grid 레이아웃에 맞게 row와 column 설정
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
@@ -65,12 +107,20 @@ class DBSelector(ttk.Frame):
         ysb = ttk.Scrollbar(frame, orient=tk.VERTICAL)
         ysb.grid(row=0, column=1, sticky="ns")
 
-        tree = ttk.Treeview(frame, columns=("type"), show='tree headings', yscrollcommand=ysb.set)
+        tree = ttk.Treeview(frame, columns=('type', 'size'), show='tree headings', yscrollcommand=ysb.set)
         tree.grid(row=0, column=0, sticky="nsew")
         tree.heading("#0", text="Name", anchor='w')
         tree.heading("type", text="Type", anchor='w')
+        tree.heading("size", text="Size", anchor='w')
+
+        # 고정 너비 설정
+        tree.column("type", width=100, minwidth=100, stretch=False)
+        tree.column("size", width=80, minwidth=100, stretch=False)
 
         ysb.config(command=tree.yview)
+
+        # 스타일 지정
+        tree.tag_configure('empty', foreground='grey')  # 또는 background, font 등
 
         # 메뉴바
         self.create_menubar()
@@ -78,13 +128,15 @@ class DBSelector(ttk.Frame):
         idx = 1
         for db_info in self.data:
             db_name = db_info['name']
-            item_id = tree.insert('', 'end', text=db_name, values=['database'])
+            tables = self.get_tables(db_name)
+            item_id = tree.insert('', 'end', text=db_name, values=['database', len(tables)])
             idx += 1
 
-            tables = self.get_tables(db_name)
             if tables:
                 for table in tables:
-                    tree.insert(item_id, "end", text=table, values=['table'])
+                    rows = self.get_rows(db_name, table)
+                    tag = 'empty' if rows == 0 else ''
+                    tree.insert(item_id, "end", text=table, values=['table', rows], tags=(tag,))
                     idx += 1
 
         tree.bind('<Double-1>', self.select_tree_item)
